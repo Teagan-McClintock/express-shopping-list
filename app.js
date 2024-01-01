@@ -3,7 +3,9 @@
 const express = require("express");
 const db = require("./fakeDb");
 
-const itemRoutes = require('./itemRoutes')
+const itemRoutes = require('./itemRoutes');
+
+const { NotFoundError } = require('./expressError');
 
 const app = express()
 //we need JSON

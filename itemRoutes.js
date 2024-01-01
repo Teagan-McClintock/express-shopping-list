@@ -7,6 +7,8 @@ const router = new express.Router();
 
 const { items } = require("./fakeDb.js");
 
+const { NotFoundError } = require('./expressError');
+
 /** GET /items:  Return list of shopping items */
 
 router.get("/", function (req, res) {
@@ -30,10 +32,14 @@ router.post("/", function (req, res) {
 router.get("/:name", function (req, res) {
   //look through our items array for an item with name :name
   // return that item
- // const name = req.params
-  for(item of items){
-    if(item.name)
+  const name = req.params.name;
+  for (let item of items) {
+    if (item.name === name) {
+      return res.send(item);
+    }
   }
+
+  throw new NotFoundError("Item not found");
 
 });
 
@@ -41,6 +47,21 @@ router.get("/:name", function (req, res) {
 /** Accept JSON body, modify item, return it  */
 
 router.patch("/:name", function (req, res) {
+  const name = req.params.name;
+  const passedItem = req.body.item;
+  for (let item of items) {
+    if (item.name === name) {
+      for (let key in Object.keys(item)) {
+        if (key in passedItem)
+        {
+          item.key = passedItem.key;
+        }
+      }
+      return res.send({"updated": item});
+    }
+  }
+
+  throw new NotFoundError("Item not found");
 
 });
 
@@ -48,6 +69,15 @@ router.patch("/:name", function (req, res) {
 /** Delete item given in URL parameter */
 
 router.delete("/:name", function (req, res) {
+  const name = req.params.name;
+  for (let item of items) {
+    if (item.name === name) {
+      items.splice(items.indexOf(item), 1);
+      return res.send({"message": "Deleted"});
+    }
+  }
+
+  throw new NotFoundError("Item not found");
 
 });
 
