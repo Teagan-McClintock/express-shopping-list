@@ -10,7 +10,7 @@ const { NotFoundError } = require('./expressError');
 /** GET /items:  Return list of shopping items */
 
 router.get("/", function (req, res) {
-  return res.json(db);
+  return res.json({"items": db.items});
 });
 
 //TODO: item class?
