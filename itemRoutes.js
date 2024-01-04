@@ -2,17 +2,15 @@
 
 const express = require("express");
 
-const db = require("./fakeDb");
 const router = new express.Router();
-
-const { items } = require("./fakeDb.js");
+const db = require("./fakeDb");
 
 const { NotFoundError } = require('./expressError');
 
 /** GET /items:  Return list of shopping items */
 
 router.get("/", function (req, res) {
-  return res.json({ items });
+  return res.json(db);
 });
 
 //TODO: item class?
@@ -21,8 +19,8 @@ router.get("/", function (req, res) {
 
 router.post("/", function (req, res) {
   const newItem = req.body.item;
-  //debugger;
-  items.push(newItem);
+
+  db.items.push(newItem);
   return res.send({ added: newItem });
 });
 
@@ -30,10 +28,9 @@ router.post("/", function (req, res) {
 /** GET /items/:name: Return single item from URL parameter */
 
 router.get("/:name", function (req, res) {
-  //look through our items array for an item with name :name
-  // return that item
   const name = req.params.name;
-  for (let item of items) {
+
+  for (let item of db.items) {
     if (item.name === name) {
       return res.send(item);
     }
@@ -48,13 +45,14 @@ router.get("/:name", function (req, res) {
 
 router.patch("/:name", function (req, res) {
   const name = req.params.name;
-  const passedItem = req.body.item;
-  for (let item of items) {
+  const passedItem = req.body;
+
+  for (let item of db.items) {
     if (item.name === name) {
-      for (let key in Object.keys(item)) {
+      for (let key of Object.keys(item)) {
         if (key in passedItem)
         {
-          item.key = passedItem.key;
+          item[key] = passedItem[key];
         }
       }
       return res.send({"updated": item});
@@ -70,9 +68,10 @@ router.patch("/:name", function (req, res) {
 
 router.delete("/:name", function (req, res) {
   const name = req.params.name;
-  for (let item of items) {
+
+  for (let item of db.items) {
     if (item.name === name) {
-      items.splice(items.indexOf(item), 1);
+      db.items.splice(db.items.indexOf(item), 1);
       return res.send({"message": "Deleted"});
     }
   }
